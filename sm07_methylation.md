@@ -1,4 +1,4 @@
-STAT540 - Seminar 10: DNA methylation analysis with Illumina Infinium
+STAT540 - Seminar 7: DNA methylation analysis with Illumina Infinium
 DNA microarrays
 ================
 
