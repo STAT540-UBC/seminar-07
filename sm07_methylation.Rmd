@@ -1,5 +1,5 @@
 ---
-title: 'STAT540 - Seminar 10: DNA methylation analysis with Illumina Infinium DNA microarrays'
+title: 'STAT540 - Seminar 7: DNA methylation analysis with Illumina Infinium DNA microarrays'
 output: 
   github_document
 ---
@@ -20,12 +20,13 @@ By the end of this tutorial, you should be able to
 
 ## Setup - install and load packages
 
-First we load necessary packages into our session. If any of these packages are not already installed on your system, you'll first need to install them with `BiocManager::install()`. You likely don't already have the Bioconductor Workflow package (`methylationArrayAnalysis`) or `DMRcatedata` pre-installed, so we've included those commands in the following chunk. The first package includes the dataset we'll work with, so it involves a sizeable download (on the order of hundreds of MB) and may take several minutes depending on your connection. We'll also make heavy use of the `minfi`, `limma`, and `DMRcate` Bioconductor packages, which are automatically loaded by the workflow package.
+First we load necessary packages into our session. If any of these packages are not already installed on your system, you'll first need to install them with `BiocManager::install()`. You likely don't already have the Bioconductor Workflow package (`methylationArrayAnalysis`), `DMRcate`, or `DMRcatedata` pre-installed, so we've included those commands in the following chunk. The first package includes the dataset we'll work with, so it involves a sizeable download (on the order of hundreds of MB) and may take several minutes depending on your connection. We'll also make heavy use of the `minfi`, `limma`, and `DMRcate` Bioconductor packages, which are automatically loaded by the workflow package.
 
 First install `methylationArrayAnalysis` and `DMRcatedata` by running this command in your console (only need to run it once, not every time you knit, so chunk is set to `eval = FALSE`).
 
 ```{r, eval = FALSE}
 BiocManager::install("methylationArrayAnalysis")
+BiocManager::install("DMRcate")
 BiocManager::install("DMRcatedata")
 ```
 
@@ -33,12 +34,14 @@ Install any other packages below before loading the libraries if you don't alrea
 
 ```{r, message=FALSE, warning=FALSE}
 library(methylationArrayAnalysis)
+library(DMRcate)
 library(DMRcatedata)
 library(tidyverse)
 library(ggplot2)
 theme_set(theme_bw())
 library(ComplexHeatmap)
 library(circlize)
+set.seed(540)
 ```
 
 ## Introduction  
@@ -111,10 +114,10 @@ Let's plot the per-sample distributions of the raw versus normalized beta values
 ```{r, fig.width = 10}
 # vizualise what the data looks like before and after normalization
 par(mfrow = c(1,2))
-densityPlot(rgSet, sampGroups = targets$Sample_Group,main="Raw", legend = FALSE)
+densityPlot(rgSet, sampGroups = targets$Sample_Group, main = "Raw", legend = FALSE)
 legend("top", legend = levels(factor(targets$Sample_Group)), 
        text.col=brewer.pal(8,"Dark2"))
-densityPlot(getBeta(mSetNorm), sampGroups=targets$Sample_Group,
+densityPlot(getBeta(mSetNorm), sampGroups = targets$Sample_Group,
             main="Normalized", legend=FALSE)
 legend("top", legend = levels(factor(targets$Sample_Group)), 
        text.col=brewer.pal(8,"Dark2"))
@@ -225,6 +228,19 @@ plotMDS(getM(mSetNormFilt), top = 1000, gene.selection="common",
         col=pal[factor(targets$Sample_Source)])
 legend("topright", legend=levels(factor(targets$Sample_Source)), text.col=pal,
        bg="white", cex=0.7)
+```
+
+We will also filter out probes that have shown to be cross-reactive (i.e. probes that have been demonstrated to map to multiple places in the genome). This list was originally published by [Chen et al. (2013)](https://doi.org/10.4161/epi.23470).
+
+```{r}
+# exclude cross reactive probes 
+xReactiveProbes <- read.csv(file=paste(dataDirectory,
+                                       "48639-non-specific-probes-Illumina450k.csv",
+                                       sep="/"), stringsAsFactors=FALSE)
+keep <- !(featureNames(mSetNormFilt) %in% xReactiveProbes$TargetID)
+table(keep)
+mSetNormFilt <- mSetNormFilt[keep,] 
+mSetNormFilt
 ```
 
 Great! After filtering poor quality probes and probes near SNPs, we see that PC1 and PC2 are not as strongly associated with individual variation (especially PC2).
@@ -397,7 +413,7 @@ The next step in the analysis pipeline would be to interpret our result by assoc
 
 ## Methylation sequencing
 
-We've only scratched the surface of DNA methylation analysis. This seminar focused entirely on analysis of DNA methylation microarrays (in particular the 450K array). As sequencing technologies are becoming popular, techniques like Whole Genome Bisulfite Sequencing (WGBS) and Methylated DNA Immunoprecipitation followed by sequencing (MEDIP-seq) are becoming more widely used. These bring with them new analysis challenges. For an overview, refer to [this slide deck from last year](https://github.com/STAT540-UBC/STAT540-UBC.github.io/blob/master/lectures/archive/lectures_2020/lect17_Methylation.pdf).
+We've only scratched the surface of DNA methylation analysis. This seminar focused entirely on analysis of DNA methylation microarrays (in particular the 450K array). As sequencing technologies are becoming popular, techniques like Whole Genome Bisulfite Sequencing (WGBS) and Methylated DNA Immunoprecipitation followed by sequencing (MEDIP-seq) are becoming more widely used. These bring with them new analysis challenges. Refer to [lecture 11](https://stat540-ubc.github.io/lectures/lect11-epigenetics/lect11-epigenetics.html) for an overview. 
 
 ## Session info
 
