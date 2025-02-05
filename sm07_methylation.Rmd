@@ -412,14 +412,12 @@ The next step in the analysis pipeline would be to interpret our result by assoc
 
 We've only scratched the surface of DNA methylation analysis. This seminar focused entirely on analysis of DNA methylation microarrays (in particular the 450K array). As sequencing technologies are becoming popular, techniques like Whole Genome Bisulfite Sequencing (WGBS) and Methylated DNA Immunoprecipitation followed by sequencing (MEDIP-seq) are becoming more widely used. These bring with them new analysis challenges. Refer to [lecture 11](https://stat540-ubc.github.io/lectures/lect11-epigenetics/lect11-epigenetics.html) for an overview.
 
-## Exercise
+## Deliverable
 
-Plot all differentially methylated probes across the genome, and obtain and plot any one of the DMRs for the `rTreg - act_rTreg` contrast. In addition, add the name(s) of nearest genes to the plot of the top 5 differentially methylated probes.
+Let's look at differential methylation for a different contrast. For the `act_naive - act_rTreg` contrast:
 
- 
+- Plot the top 5 differentially methylated probes, and add the name(s) of the nearest genes to the plot.
 
-## Session info
+- Plot all differentially methylated probes across the genome.
 
-```{r}
-sessionInfo()
-```
+- Plot any one DMR.
