@@ -1089,3 +1089,7 @@ Let’s look at differential methylation for a different contrast. For the
 - Plot all differentially methylated probes across the genome.
 
 - Plot any one DMR.
+
+``` r
+### YOUR CODE HERE
+```
